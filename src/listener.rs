@@ -31,7 +31,7 @@ impl UnixListener {
     fn _bind(path: &Path) -> io::Result<UnixListener> {
         unsafe {
             let (addr, len) = try!(sockaddr_un(path));
-            let fd = try!(Socket::new(libc::SOCK_STREAM));
+            let fd = try!(Socket::new(libc::SOCK_SEQPACKET));
 
             let addr = &addr as *const _ as *const _;
             try!(cvt(libc::bind(fd.fd(), addr, len)));

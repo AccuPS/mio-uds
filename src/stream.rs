@@ -18,7 +18,7 @@ use socket::{sockaddr_un, Socket};
 
 /// A Unix stream socket.
 ///
-/// This type represents a `SOCK_STREAM` connection of the `AF_UNIX` family,
+/// This type represents a `SOCK_SEQPACKET` connection of the `AF_UNIX` family,
 /// otherwise known as Unix domain sockets or Unix sockets. This stream is
 /// readable/writable and acts similarly to a TCP stream where reads/writes are
 /// all in order with respect to the other connected end.
@@ -50,7 +50,7 @@ impl UnixStream {
     fn _connect(path: &Path) -> io::Result<UnixStream> {
         unsafe {
             let (addr, len) = try!(sockaddr_un(path));
-            let socket = try!(Socket::new(libc::SOCK_STREAM));
+            let socket = try!(Socket::new(libc::SOCK_SEQPACKET));
             let addr = &addr as *const _ as *const _;
             match cvt(libc::connect(socket.fd(), addr, len)) {
                 Ok(_) => {}
@@ -76,7 +76,7 @@ impl UnixStream {
     ///
     /// Returns two `UnixStream`s which are connected to each other.
     pub fn pair() -> io::Result<(UnixStream, UnixStream)> {
-        Socket::pair(libc::SOCK_STREAM).map(|(a, b)| unsafe {
+        Socket::pair(libc::SOCK_SEQPACKET).map(|(a, b)| unsafe {
             (UnixStream::from_raw_fd(a.into_fd()),
              UnixStream::from_raw_fd(b.into_fd()))
         })
